@@ -104,3 +104,42 @@ const addUserSocketToRoom = (roomId: string, userId: string, socketId: string) =
   }
   roomUserSockets.get(userId)!.add(socketId);
 };
+
+const removeUserSocketFromRoom = (roomId: string, userId: string, socketId: string) => {
+  const roomUserSockets = userSocketsInRoom.get(roomId);
+  if (!roomUserSockets) return false;
+  
+  const userSockets = roomUserSockets.get(userId);
+  if (!userSockets) return false;
+  
+  userSockets.delete(socketId);
+  
+  if (userSockets.size === 0) {
+    roomUserSockets.delete(userId);
+    return true;
+  }
+  
+  if (roomUserSockets.size === 0) {
+    userSocketsInRoom.delete(roomId);
+  }
+  
+  return false;
+};
+
+const addMove = (roomId: string, socketId: string, move: Move) => {
+  const room = rooms.get(roomId);
+  if (!room) return;
+
+  if (!room.users.has(socketId)) {
+    room.usersMoves.set(socketId, [move]);
+  }
+
+  room.usersMoves.get(socketId)!.push(move);
+};
+
+const undoMove = (roomId: string, socketId: string) => {
+  const room = rooms.get(roomId);
+  if (!room) return;
+
+  room.usersMoves.get(socketId)!.pop();
+};
