@@ -65,3 +65,42 @@ interface Room {
   drawed: Move[];
   users: Map<string, AuthenticatedUser>;
 }
+
+const rooms = new Map<string, Room>();
+const userSocketsInRoom = new Map<string, Map<string, Set<string>>>();
+
+
+const getUniqueUsersInRoom = (roomId: string) => {
+  const room = rooms.get(roomId);
+  if (!room) return new Map();
+
+  const uniqueUsers = new Map<string, AuthenticatedUser>();
+  room.users.forEach((user) => {
+    uniqueUsers.set(user.id, user);
+  });
+  return uniqueUsers;
+};
+
+const userHasOtherTabsInRoom = (roomId: string, userId: string, currentSocketId: string): boolean => {
+  const roomUserSockets = userSocketsInRoom.get(roomId);
+  if (!roomUserSockets) return false;
+  
+  const userSockets = roomUserSockets.get(userId);
+  if (!userSockets) return false;
+  
+  const otherSockets = new Set(userSockets);
+  otherSockets.delete(currentSocketId);
+  return otherSockets.size > 0;
+};
+
+const addUserSocketToRoom = (roomId: string, userId: string, socketId: string) => {
+  if (!userSocketsInRoom.has(roomId)) {
+    userSocketsInRoom.set(roomId, new Map());
+  }
+  const roomUserSockets = userSocketsInRoom.get(roomId)!;
+  
+  if (!roomUserSockets.has(userId)) {
+    roomUserSockets.set(userId, new Set());
+  }
+  roomUserSockets.get(userId)!.add(socketId);
+};
