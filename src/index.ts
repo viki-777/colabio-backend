@@ -330,3 +330,10 @@ server.listen(PORT, () => {
   console.log(`Environment: ${process.env.NODE_ENV}`);
   console.log(`Allowed origins: ${process.env.CLIENT_URL || "localhost:3000"}`);
 });
+
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  server.close(() => {
+    console.log('Process terminated');
+  });
+});
