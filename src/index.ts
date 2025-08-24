@@ -40,3 +40,28 @@ app.get('/health', (req, res) => {
     connectedClients: io.engine.clientsCount
   });
 });
+
+
+interface Move {
+  id: string;
+  path: [number, number][];
+  options: {
+    stroke: string;
+    strokeWidth: number;
+    fill?: string;
+  };
+  timestamp: number;
+}
+
+interface AuthenticatedUser {
+  id: string;
+  name: string;
+  email: string;
+  image?: string;
+}
+
+interface Room {
+  usersMoves: Map<string, Move[]>;
+  drawed: Move[];
+  users: Map<string, AuthenticatedUser>;
+}
